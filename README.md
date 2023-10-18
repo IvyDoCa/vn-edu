@@ -1,5 +1,5 @@
 # vn-edu
-Vietnam Education Dataset: 2021-2022 High School
+Vietnam Education Dataset: 2021-2022 High School  
 The dataset is authorized by Portal of the Ministry of Education and Training of Vietnam which is available in the link below:
 https://moet.gov.vn/Pages/exam20212022TH.aspx
 In this study, the dataset was collected through the examination from 2021 to 2022 for high school students through three compulsory courses which are Literature, Mathematics and Foreign Language; one optional Natural Sciences course which is Physics, Chemistry, or Biology; and one optional Social Sciences which could be History, Geography, or Civic Education either.
