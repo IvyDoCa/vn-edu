@@ -1,0 +1,123 @@
+---
+title: "Vietnam Education Dataset: 2021-2022 High School "
+author: "Ivy"
+date: "25/12/2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction  
+File's name: Project Code file  
+The following chunk codes are utilized for visualizing the dataset bank_full.csv.  
+This is divided into three primary parts which are:  
+Preprocessing part,  
+Autocorrelation addressing part,  
+Visualization part.  
+```{r Import the dataset}
+#Import the dataset
+df <- read.csv("bank_full.csv", header = TRUE, stringsAsFactors = FALSE)
+#See the dataset
+head(df)
+```
+```{r preprocessing}
+#Deal with missing value
+df$mathematics_score <- ifelse(is.na(df$mathematics_score),
+                               ave(df$mathematics_score, FUN = function(x)
+                                 mean(x, na.rm = TRUE)),
+                               df$mathematics_score)
+df$literature_score <- ifelse(is.na(df$literature_score),
+                               ave(df$literature_score, FUN = function(x)
+                                 mean(x, na.rm = TRUE)),
+                               df$literature_score)
+df$foreign_language_score <- ifelse(is.na(df$foreign_language_score),
+                               ave(df$foreign_language_score, FUN = function(x)
+                                 mean(x, na.rm = TRUE)),
+                               df$foreign_language_score)
+#Categorizing variables
+df$gender <- factor(df$gender,levels = c("female","male"),labels = c(0,1))
+df$foreign_language_type <- factor(df$foreign_language_type,
+                                   levels = c("N1","N2","N3","N4","N5","N6","N7"),
+                                   labels = c(1,2,3,4,5,6,7))
+#Checking duplicate observations
+library(tidyverse)
+duplicated(df) #to spot the position of duplicated observation in df
+df[duplicated(df)] #to extract the duplicated elements (if any)
+```
+```{r autocorrelation}
+#fit regression model
+model <- lm(df$mathematics_score~df$gender+df$year+df$enroll_date, data=df)
+#perform Durbin-Watson test
+install.packages("lmtest")
+library(lmtest)
+x <- df$gender
+y <- df$mathematics_score
+dwtest(y ~ x)
+
+```
+
+```{r Linear relationship between two variables}
+plot(x,y)
+smoothScatter(y~x, bandwidth = 0.4)
+scatter.smooth(y,x, lpars = list(col = "blue", lwd = 3, lty = 3))
+abline(lm(y~x), col='red',lwd=3)
+legend('topright', c('Linear','Smoothing'), lty=c(1,2), lwd=c(3,3), col=c('red','blue'))
+```
+```{r solving installing ggplot2 package}
+remove.packages("ggplot2") # Unisntall ggplot2
+install.packages("ggplot2", dependencies = TRUE) # Install ggplot2 again
+```
+```{r Multivariate plots}
+plot(~df$foreign_language_score+df$mathematics_score+df$literature_score, data=df)
+pairs(~df$foreign_language_score+df$mathematics_score+df$literature_score, data=df)
+```
+
+```{r gender variables}
+gender<- table(df$gender)
+barplot(gender,horiz = TRUE, col = rainbow(length(gender)),
+        main="Frequency of male and female")
+```
+```{r two discrete variables}
+lit<-cut(df$literature_score,3)
+table(lit)
+lit.gen<-table(df$gender,lit)
+lit.gen
+barplot(lit.gen,main="Number of male and female pupils in each literature score group", beside=TRUE, xlab="Age group")
+```
+
+```{r Boxplot for spotting outliers}
+op<-par(mfrow=c(1,1)) # Divide the screen into 2 cells of 1 rows and 1 column
+boxplot(df$physics_score, main="Box plot of physics subject score", ylab="Score")
+boxplot(df$chemistry_score, main="Box plot of chemistry subject score", ylab="Score")
+boxplot(df$biology_score, main="Box plot of biology subject score", ylab="Score")
+boxplot(df$history_score, main="Box plot of history subject score", ylab="Score")
+boxplot(df$geography_score, main="Box plot of geography subject score", ylab="Score")
+boxplot(df$civic_education_score, main="Box plot of civic education subject score", ylab="Score")
+boxplot(df$physics_score~df$chemistry_score, horizontal=FALSE, 
+        main="Box plot of physics and chemistry subjects score",
+        xlab = "physics and chemistry subjects", ylab="Score", col = "pink")
+boxplot(df$history_score~df$geography_score, horizontal=TRUE, 
+        main="Box plot of history and geography subjects score", 
+        xlab="history and geography subjects",ylab="Score", col = "blue")
+```
+
+```{r The distribution of optional subject}
+physics<-subset(df,df$physics_score=="NA")
+length(physics)
+chem<-subset(df,df$chemistry_score=="NA")
+length(chem)
+bio<-subset(df,df$biology_score=="NA")
+length(bio)
+his<-subset(df,df$history_score=="NA")
+length(his)
+geo<-subset(df,df$geography_score=="NA")
+length(geo)
+civ<-subset(df,df$civic_education_score=="NA")
+length(civ)
+pie(c(length(physics),length(chem),length(bio),
+      length(his),length(geo),length(civ)), 
+    main = "The distribution of optional subject")
+```
+
